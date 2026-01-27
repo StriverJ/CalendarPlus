@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日程看板 - 极速跳转版</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --p3: #f43f5e; --p2: #f59e0b; --p1: #10b981; --p0: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'PingFang SC', system-ui, sans-serif;
+            background: var(--bg); color: var(--text);
+            height: 100vh; overflow: hidden; display: flex;
+        }
+
+        .app-container { display: grid; grid-template-columns: 360px 1fr; width: 100vw; height: 100vh; }
+
+        /* 左侧固定栏 */
+        .sidebar { background: #fff; border-right: 1px solid var(--border); display: flex; flex-direction: column; height: 100vh; }
+
+        /* 左上：日历（固定高度） */
+        .calendar-box { padding: 20px; border-bottom: 1px solid var(--border); height: 430px; }
+        
+        /* 滚轮选择器区域 */
+        .calendar-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; gap: 5px; }
+        
+        .picker-group { display: flex; gap: 4px; align-items: center; }
+        select.wheel-picker {
+            border: none; background: #f1f5f9; padding: 5px 8px; border-radius: 6px;
+            font-weight: bold; color: var(--text); cursor: pointer; outline: none; font-size: 0.9rem;
+        }
+
+        .today-btn {
+            background: var(--primary); color: white; border: none; padding: 5px 10px;
+            border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: 600;
+        }
+
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+        .weekday { text-align: center; font-size: 0.7rem; color: var(--text-light); font-weight: bold; padding-bottom: 8px; }
+        .day {
+            aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; border-radius: 8px; font-size: 0.85rem; position: relative; height: 42px;
+        }
+        .day.selected { background: var(--primary) !important; color: white; }
+        .day.today { border: 2px solid var(--primary); color: var(--primary); font-weight: bold; }
+        .dots-container { display: flex; gap: 2px; position: absolute; bottom: 4px; }
+        .dot { width: 4px; height: 4px; border-radius: 50%; }
+
+        /* 左下：添加日程 */
+        .input-box { padding: 20px; flex: 1; background: #fafafa; display: flex; flex-direction: column; gap: 10px; }
+        textarea { height: 70px; resize: none; }
+        .add-btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+        /* 右侧展示区 */
+        .main-content { display: flex; flex-direction: column; height: 100vh; padding: 30px; gap: 20px; }
+        .top-info { display: flex; justify-content: space-between; align-items: flex-end; }
+        .stats-group { display: flex; gap: 10px; }
+        .stat-item { background: #fff; padding: 8px 12px; border-radius: 10px; border-bottom: 3px solid #eee; text-align: center; min-width: 55px; }
+        .stat-item b { display: block; font-size: 1.1rem; }
+        .stat-item label { font-size: 0.6rem; color: var(--text-light); }
+
+        /* 任务列表 */
+        .task-scroll-area { flex: 1; overflow-y: auto; }
+        .todo-item {
+            background: #fff; border-radius: 12px; margin-bottom: 10px;
+            border-left: 6px solid #ccc; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            display: flex; flex-direction: column; cursor: pointer; transition: 0.2s;
+        }
+        .todo-item.p3 { border-left-color: var(--p3); }
+        .todo-item.p2 { border-left-color: var(--p2); }
+        .todo-item.p1 { border-left-color: var(--p1); }
+        .todo-item.p0 { border-left-color: var(--p0); }
+
+        .item-row { display: flex; align-items: center; padding: 15px 20px; }
+        .title-text { flex: 1; margin: 0 15px; font-weight: 600; }
+        .item-desc { max-height: 0; padding: 0 20px; color: var(--text-light); font-size: 0.85rem; transition: 0.3s; overflow: hidden; }
+        .todo-item.expanded .item-desc { max-height: 150px; padding: 12px 20px; border-top: 1px solid #f1f5f9; }
+
+        /* 归档 */
+        .archive-drawer { background: #f1f5f9; border-radius: 12px; padding: 12px; max-height: 50px; transition: 0.4s; overflow: hidden; border: 1px solid var(--border); }
+        .archive-drawer.open { max-height: 250px; background: #fff; }
+        .archive-header { display: flex; justify-content: space-between; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <aside class="sidebar">
+        <div class="calendar-box">
+            <div class="calendar-nav">
+                <div class="picker-group">
+                    <select id="yearPicker" class="wheel-picker" onchange="jumpToDate()"></select>
+                    <select id="monthPicker" class="wheel-picker" onchange="jumpToDate()"></select>
+                </div>
+                <button class="today-btn" onclick="backToToday()">今天</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+        
+        <div class="input-box">
+            <h4 style="color:var(--text-light); font-size: 0.8rem;">+ 新建日程</h4>
+            <input type="text" id="todoTitle" placeholder="任务标题">
+            <textarea id="todoDesc" placeholder="任务详情"></textarea>
+            <select id="todoPriority">
+                <option value="p3">🔴 紧急</option>
+                <option value="p2">🟠 高级</option>
+                <option value="p1" selected>🟢 普通</option>
+                <option value="p0">⚪ 低级</option>
+            </select>
+            <button class="add-btn" onclick="addTask()">保存日程</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-info">
+            <div>
+                <h1 id="targetDateLabel">加载中...</h1>
+                <p style="color:var(--text-light); font-size:0.85rem">当日任务明细</p>
+            </div>
+            <div class="stats-group" id="statsBar"></div>
+        </div>
+
+        <div class="task-scroll-area" id="taskList"></div>
+
+        <div class="archive-drawer" id="archiveDrawer">
+            <div class="archive-header" onclick="toggleArchive()">
+                <span>📂 已完成 (<span id="archiveCount">0</span>)</span>
+                <span id="arrow">▲</span>
+            </div>
+            <div id="archiveList" style="margin-top:10px; font-size:0.85rem; color:var(--text-light)"></div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:3000/api/todos';
+    let allData = {};
+    let viewDate = new Date();
+    let selectedKey = "";
+
+    // 初始化年份选择器 (前后10年)
+    function initPickers() {
+        const yp = document.getElementById('yearPicker');
+        const mp = document.getElementById('monthPicker');
+        const currentYear = new Date().getFullYear();
+        
+        for(let i = currentYear - 10; i <= currentYear + 10; i++) {
+            yp.options.add(new Option(i + "年", i));
+        }
+        for(let i = 0; i < 12; i++) {
+            mp.options.add(new Option((i + 1) + "月", i));
+        }
+    }
+
+    async function init() {
+        initPickers();
+        try {
+            const res = await fetch(API_URL);
+            allData = await res.json();
+        } catch (e) { console.warn("Using offline mode"); }
+        backToToday();
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+        ['日','一','二','三','四','五','六'].forEach(d => grid.innerHTML += `<div class="weekday">${d}</div>`);
+
+        const y = viewDate.getFullYear(), m = viewDate.getMonth();
+        document.getElementById('yearPicker').value = y;
+        document.getElementById('monthPicker').value = m;
+        
+        const firstDay = new Date(y, m, 1).getDay();
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div class="day empty"></div>`;
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            const key = `${y}-${m+1}-${i}`;
+            const dayEl = document.createElement('div');
+            dayEl.className = `day ${key === selectedKey ? 'selected' : ''}`;
+            
+            const now = new Date();
+            if(i === now.getDate() && m === now.getMonth() && y === now.getFullYear()) dayEl.classList.add('today');
+            dayEl.innerText = i;
+            
+            const tasks = allData[key] || [];
+            if (tasks.length > 0) {
+                const dots = document.createElement('div');
+                dots.className = 'dots-container';
+                [...new Set(tasks.filter(t=>!t.completed).map(t => t.priority))].sort().reverse().forEach(p => {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    dot.style.backgroundColor = `var(--${p})`;
+                    dots.appendChild(dot);
+                });
+                dayEl.appendChild(dots);
+            }
+            dayEl.onclick = () => selectDate(key);
+            grid.appendChild(dayEl);
+        }
+    }
+
+    function jumpToDate() {
+        const y = document.getElementById('yearPicker').value;
+        const m = document.getElementById('monthPicker').value;
+        viewDate = new Date(y, m, 1);
+        renderCalendar();
+    }
+
+    function backToToday() {
+        const now = new Date();
+        viewDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        selectDate(`${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`);
+    }
+
+    function selectDate(key) {
+        selectedKey = key;
+        document.getElementById('targetDateLabel').innerText = key.replace(/-/g, ' / ');
+        renderCalendar();
+        renderTasks();
+    }
+
+    function renderTasks() {
+        const list = document.getElementById('taskList');
+        const archiveList = document.getElementById('archiveList');
+        list.innerHTML = ''; archiveList.innerHTML = '';
+
+        const tasks = [...(allData[selectedKey] || [])];
+        tasks.sort((a, b) => b.priority.localeCompare(a.priority));
+
+        let c = { all:0, p3:0, p2:0, p1:0, p0:0, done:0 };
+
+        tasks.forEach(task => {
+            if (task.completed) {
+                c.done++;
+                archiveList.innerHTML += `<div style="padding:4px">✓ ${task.title}</div>`;
+                return;
+            }
+            c.all++; c[task.priority]++;
+            const item = document.createElement('div');
+            item.className = `todo-item ${task.priority}`;
+            item.innerHTML = `
+                <div class="item-row" onclick="this.parentElement.classList.toggle('expanded')">
+                    <input type="checkbox" onchange="completeTask('${task.title}', event)">
+                    <div class="title-text">${task.title}</div>
+                    <span onclick="deleteTask('${task.title}', event)" style="color:#ccc">删除</span>
+                </div>
+                <div class="item-desc">${task.desc || '（无详情）'}</div>
+            `;
+            list.appendChild(item);
+        });
+        document.getElementById('archiveCount').innerText = c.done;
+        updateStatsBar(c);
+    }
+
+    function updateStatsBar(c) {
+        document.getElementById('statsBar').innerHTML = `
+            <div class="stat-item"><b>${c.all}</b><label>总计</label></div>
+            <div class="stat-item" style="border-color:var(--p3)"><b>${c.p3}</b><label>紧急</label></div>
+            <div class="stat-item" style="border-color:var(--p2)"><b>${c.p2}</b><label>高</label></div>
+            <div class="stat-item" style="border-color:var(--p1)"><b>${c.p1}</b><label>中</label></div>
+            <div class="stat-item" style="border-color:var(--p0)"><b>${c.p0}</b><label>低</label></div>
+        `;
+    }
+
+    async function addTask() {
+        const title = document.getElementById('todoTitle').value.trim();
+        const desc = document.getElementById('todoDesc').value.trim();
+        const priority = document.getElementById('todoPriority').value;
+        if (!title) return;
+        if (!allData[selectedKey]) allData[selectedKey] = [];
+        allData[selectedKey].push({ title, desc, priority, completed: false });
+        document.getElementById('todoTitle').value = '';
+        document.getElementById('todoDesc').value = '';
+        sync();
+    }
+
+    function completeTask(title, e) {
+        e.stopPropagation();
+        const t = allData[selectedKey].find(x => x.title === title);
+        if(t) t.completed = true;
+        sync();
+    }
+
+    function deleteTask(title, e) {
+        e.stopPropagation();
+        allData[selectedKey] = allData[selectedKey].filter(x => x.title !== title);
+        sync();
+    }
+
+    function toggleArchive() {
+        const d = document.getElementById('archiveDrawer');
+        d.classList.toggle('open');
+        document.getElementById('arrow').innerText = d.classList.contains('open') ? '▼' : '▲';
+    }
+
+    async function sync() {
+        renderCalendar(); renderTasks();
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(allData)
+            });
+        } catch (e) {}
+    }
+
+    init();
+</script>
+</body>
+</html>

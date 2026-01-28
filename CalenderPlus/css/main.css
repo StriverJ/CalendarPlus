@@ -1,0 +1,62 @@
+:root {
+    --primary-color: #4a90e2;
+    --text-main: #333;
+    --text-muted: #999;
+    --bg-color: #f5f7fa;
+    --card-bg: #ffffff;
+}
+
+/* 修改后的 body 定义 */
+body {
+    /* 1. 保留基础字体定义 */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f5f7fa; 
+
+    /* 2. 布局核心修改：移除之前的 center 居中逻辑 */
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    
+    /* 确保 body 内部的 main-container 是唯一的顶层容器 */
+    display: block; 
+    overflow: hidden; /* 防止整页溢出，让内部面板自己管理滚动 */
+}
+
+/*日历插槽 */
+.calendar-slot {
+    display: flex;
+    justify-content: center; /* 只在左侧上方的区域内居中日历 */
+    padding: 20px 0;
+}
+
+.main-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* 左侧面板：占 40% 宽度 */
+.left-panel {
+    flex: 0 0 30%; /* 固定宽度，或者用 40% */
+    background-color: #f9fbff;
+    border-right: 1px solid #eee;
+    display: flex;
+    flex-direction: column; /* 纵向排列 */
+    padding: 20px;
+}
+
+
+/* 右侧面板：占据剩余所有空间 */
+.right-panel {
+    flex: 1;
+    background-color: #ffffff;
+    padding: 40px;
+    overflow-y: auto; /* 内容多了可以滚动 */
+}
+
+/* 适配你之前的日历卡片，确保它不会溢出 */
+.calendar-card {
+    width: 100% !important; /* 让日历填满左侧容器宽度 */
+    box-sizing: border-box;
+}

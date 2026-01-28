@@ -1,0 +1,120 @@
+.calendar-card {
+    background: var(--card-bg);
+    width: 380px;
+    border-radius: 15%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    padding: 25px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.calendar-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-main);
+}
+
+.nav-btns button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: color 0.3s;
+}
+
+.nav-btns button:hover {
+    color: var(--primary-color);
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.day {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    border-radius: 15%;
+    transition: all 0.2s;
+    color: var(--text-main);
+}
+
+.day:hover {
+    background-color: #f0f4f8;
+}
+
+.day.today {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+}
+
+.day.empty {
+    cursor: default;
+}
+
+/* 选中的日期样式 */
+.day.selected {
+    background-color: #e3f2fd; /* 浅蓝色背景 */
+    border: 2px solid var(--primary-color); /* 蓝色边框 */
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* 如果选中的正好是今天，可以做个特殊重叠处理 */
+.day.today.selected {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px var(--primary-color);
+}
+/* 切换月份和年份的动画 */
+/* 定义动画状态 */
+.days-grid {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 切换时的消失状态 */
+.days-grid.fade-out {
+    opacity: 0;
+    transform: translateY(5px); /* 轻微下移，增加动感 */
+}
+
+/* 回到今天按钮样式 */
+.text-btn {
+    font-size: 0.85rem !important;
+    font-weight: 500;
+    padding: 4px 8px;
+    background: #f0f4f8 !important; /* 给它一个淡淡的背景 */
+    border-radius: 15%;
+    margin-right: 10px;
+    color: var(--primary-color) !important;
+}
+
+.text-btn:hover {
+    background: var(--primary-color) !important;
+    color: white !important;
+}

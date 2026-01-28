@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简约现代日历</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/calendar.css">
+</head>
+<body>
+    <div class="main-container">
+        <aside class="left-panel">
+        <!-- 日历部分 -->
+            <div class="calendar-card">
+                <div class="calendar-header">
+                    <h2 id="month-year">2023年 10月</h2>
+                    <div class="nav-btns">
+                        <button id="prev-btn">&lt;</button>
+                        <button id="next-btn">&gt;</button>
+                        <button id="today-btn" class="text-btn">今天</button>
+                    </div>
+                </div>
+                
+                <div class="calendar-body">
+                    <div class="weekdays">
+                        <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+                    </div>
+                    <div id="days-grid" class="days-grid">
+                        </div>
+                </div>
+            </div>
+        </aside>
+        <main class="right-panel">
+            <div id="right-panel-top" class="topbar">
+                <div id="right-top-date-display">
+                    Welcome to CalendarPlus
+                </div>
+
+            </div>
+            <p>请选择左侧日历中的日期以查看详情。</p>
+        </main>
+    </div>
+    <script src="JavaScript/calendar.js"></script>
+    <script type="module" src="JavaScript/eventmanage.js"></script>
+</body>
+</html>

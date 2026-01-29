@@ -6,7 +6,7 @@ const todayObj = new Date();
 const todayBtn = document.getElementById('today-btn');
 // 默认初始化为今天的日期字符串，例如 "2026-0-28" (注意月份从0开始)
 let selectedDateStr = `${todayObj.getFullYear()}-${todayObj.getMonth()}-${todayObj.getDate()}`;
-
+window.selectedDateStr = selectedDateStr;//初始化挂载保险
 let currentDate = new Date();
 
 function renderCalendar() {
@@ -53,6 +53,8 @@ function renderCalendar() {
         // 点击选择日期
         dayDiv.addEventListener('click', () => {
             selectedDateStr = dateID;
+            // 强制同步给全局变量，让 eventmanage.js 能读取到最新值
+            window.selectedDateStr = dateID;    
             renderCalendar();
             selectNewDate(selectedDateStr);
         });

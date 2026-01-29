@@ -54,6 +54,7 @@ function renderCalendar() {
         dayDiv.addEventListener('click', () => {
             selectedDateStr = dateID;
             renderCalendar();
+            selectNewDate(selectedDateStr);
         });
         daysGrid.appendChild(dayDiv);
     }
@@ -105,3 +106,18 @@ todayBtn.addEventListener('click', () => {
     // 4. 执行带动画的渲染（这里传 0 表示不需要加减月份，只需重置视图）
     changeMonth(0); 
 });
+//将选中日期发射给其他模块
+function selectNewDate(date) {
+    const event = new CustomEvent('dateUpdate', { detail: date });
+    window.dispatchEvent(event);
+};
+/**在页面完全加载（包含 eventmanage.js）之后，补发一次初始信号**/
+window.addEventListener('load', () => {
+    // 确保此时变量是有值的
+    if (typeof selectNewDate === 'function') {
+        selectNewDate(selectedDateStr);
+    }
+});
+
+// 为了确保 eventmanage.js 能读取到这个变量，建议将它挂载到 window
+window.selectedDateStr = selectedDateStr;

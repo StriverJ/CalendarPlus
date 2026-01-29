@@ -6,6 +6,7 @@
     <title>简约现代日历</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/calendar.css">
+    <link rel="stylesheet" href="css/eventmanage.css">
 </head>
 <body>
     <div class="main-container">
@@ -29,18 +30,35 @@
                         </div>
                 </div>
             </div>
+            <div>
+                <input id="input-event-title" type="text" placeholder="点击输入日程标题"></input>
+                <textarea id="input-event-detail" placeholder="点击输入日程详情"></textarea>
+            </div>
         </aside>
         <main class="right-panel">
             <div id="right-panel-top" class="topbar">
                 <div id="right-top-date-display">
-                    Welcome to CalendarPlus
+                    <div id="topbar-year">
+                        2026
+                    </div>
+                    <div class="date-division"></div>
+                    <div id="topbar-month">
+                        1
+                    </div>
+                    <div class="date-division"></div>
+                    <div id="topbar-day">
+                        1
+                    </div>
+                    <div class="date-division"></div>
+                    <div id="topbar-weekday">
+                        星期四
+                    </div>
                 </div>
 
             </div>
-            <p>请选择左侧日历中的日期以查看详情。</p>
         </main>
     </div>
     <script src="JavaScript/calendar.js"></script>
-    <script type="module" src="JavaScript/eventmanage.js"></script>
+    <script src="JavaScript/eventmanage.js"></script>
 </body>
 </html>

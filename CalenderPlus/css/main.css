@@ -4,6 +4,10 @@
     --text-muted: #999;
     --bg-color: #f5f7fa;
     --card-bg: #ffffff;
+    --color-emergency: #ff4d4f; /* 红色 */
+    --color-priority: #ffa940;  /* 橙色 */
+    --color-normal: #52c41a;    /* 绿色 */
+    --color-remark: #1890ff;    /* 蓝色 */
 }
 
 /* 修改后的 body 定义 */

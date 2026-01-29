@@ -1,0 +1,41 @@
+/* 1. 缩小顶栏高度和左侧留白 */
+.topbar {
+    padding: 2px 5px; /* 减小内边距，让内容更靠近边缘 */
+    background-color: #ffffff;
+    border-bottom: 1px solid #f2f2f2;
+    display: flex;
+    align-items: flex-start; /* 改为 flex-start 让位置更偏上 */
+}
+
+/* 顶部日期显示区域 */
+#right-top-date-display {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 进一步缩小间距，更紧凑 */
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* 统一基础样式 */
+#topbar-year, #topbar-month, #topbar-day, #topbar-weekday {
+    font-size: 1.4rem; /* 稍微缩小一点，让留白更少 */
+    color: #333;
+    margin: 0;
+}
+
+/* 年份和星期：使用细体，产生现代感对比 */
+#topbar-year, #topbar-weekday {
+    font-weight: 300;
+    color: #7f8c8d; /* 淡淡的灰色 */
+}
+
+/* 月份和日期：使用粗体，突出重点 */
+#topbar-month, #topbar-day {
+    font-weight: 600;
+}
+
+/* 极其简练的分割线 */
+.date-division {
+    width: 1px;
+    height: 1rem;
+    background-color: #eee;
+}

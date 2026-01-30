@@ -6,24 +6,22 @@ const todayObj = new Date();
 const todayBtn = document.getElementById('today-btn');
 // 默认初始化为今天的日期字符串，例如 "2026-0-28" (注意月份从0开始)
 let selectedDateStr = `${todayObj.getFullYear()}-${todayObj.getMonth()}-${todayObj.getDate()}`;
-
+window.selectedDateStr = selectedDateStr;//初始化挂载保险
 let currentDate = new Date();
 
-function renderCalendar() {
+// 1. 【修改】将函数赋值给 window，使其成为全局函数
+window.renderCalendar = function() {
     daysGrid.innerHTML = ""; // 清空当前视图
     
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
 
-    // 设置头部标题
     monthYearElement.innerText = `${year}年 ${month + 1}月`;
 
-    // 获取本月第一天是周几 (0是周日)
     const firstDayIndex = new Date(year, month, 1).getDay();
-    // 获取本月最后一天
     const lastDay = new Date(year, month + 1, 0).getDate();
 
-    // 填充月初的空白
+    // 填充空白
     for (let i = 0; i < firstDayIndex; i++) {
         const emptyDiv = document.createElement('div');
         emptyDiv.classList.add('day', 'empty');
@@ -35,33 +33,55 @@ function renderCalendar() {
     for (let day = 1; day <= lastDay; day++) {
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('day');
-        dayDiv.innerText = day;
+        
+        // --- 结构优化：数字单独用 span 包裹 ---
+        const numSpan = document.createElement('span');
+        numSpan.innerText = day;
+        numSpan.style.zIndex = "2"; // 确保数字在最上层
+        dayDiv.appendChild(numSpan);
+        // ------------------------------------
 
-        //构建当前日期唯一标识字符串
         const dateID = `${year}-${month}-${day}`;
 
-        // 选中日期的处理
-        if (dateID === selectedDateStr) {
+        // --- 调用接口绘制圆点 ---
+        if (typeof window.getDayEventColors === 'function') {
+            const colors = window.getDayEventColors(dateID);
+            if (colors.length > 0) {
+                const dotsDiv = document.createElement('div');
+                dotsDiv.className = 'dots-container';
+                colors.forEach(color => {
+                    const dot = document.createElement('div');
+                    dot.className = 'event-dot';
+                    dot.style.backgroundColor = color;
+                    dotsDiv.appendChild(dot);
+                });
+                dayDiv.appendChild(dotsDiv);
+            }
+        }
+
+        // 选中状态
+        if (dateID === window.selectedDateStr) { // 建议统一使用 window.selectedDateStr
             dayDiv.classList.add('selected');
         }
-        // 标记今天
-        if (day === today.getDate() && 
-            month === today.getMonth() && 
-            year === today.getFullYear()) {
+        // 今天状态
+        if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
             dayDiv.classList.add('today');
         }
-        // 点击选择日期
+
+        // 点击事件
         dayDiv.addEventListener('click', () => {
-            selectedDateStr = dateID;
-            renderCalendar();
-            selectNewDate(selectedDateStr);
+            window.selectedDateStr = dateID; // 同步全局
+            selectedDateStr = dateID;        // 同步局部
+            window.renderCalendar();         // 重新渲染日历(为了更新选中样式)
+            selectNewDate(selectedDateStr);  // 发射信号
         });
+
         daysGrid.appendChild(dayDiv);
     }
 }
 
-// 初始化
-renderCalendar();
+// 初始化时调用
+window.renderCalendar();
 
 // 这是一个包装函数，专门处理带动画的月份/年份切换
 function changeMonth(delta) {

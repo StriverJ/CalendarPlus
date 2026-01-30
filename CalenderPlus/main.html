@@ -11,50 +11,96 @@
 <body>
     <div class="main-container">
         <aside class="left-panel">
-        <!-- 日历部分 -->
             <div class="calendar-card">
                 <div class="calendar-header">
-                    <h2 id="month-year">2023年 10月</h2>
+                    <h2 id="month-year">2026年 1月</h2>
                     <div class="nav-btns">
                         <button id="prev-btn">&lt;</button>
                         <button id="next-btn">&gt;</button>
                         <button id="today-btn" class="text-btn">今天</button>
                     </div>
                 </div>
-                
                 <div class="calendar-body">
                     <div class="weekdays">
                         <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
                     </div>
-                    <div id="days-grid" class="days-grid">
-                        </div>
+                    <div id="days-grid" class="days-grid"></div>
                 </div>
             </div>
-            <div>
-                <input id="input-event-title" type="text" placeholder="点击输入日程标题"></input>
-                <textarea id="input-event-detail" placeholder="点击输入日程详情"></textarea>
+
+            <div class="add-event-trigger-area">
+                <button id="btn-show-drawer" class="fab-btn">
+                    <span class="plus-icon">+</span> 创建新日程
+                </button>
+            </div>
+
+            <div id="event-drawer" class="event-form-drawer">
+                <div class="drawer-header">
+                    <h3>新建日程</h3>
+                    <button id="btn-close-drawer" class="close-icon">×</button>
+                </div>
+                
+                <div class="drawer-body">
+                    <input type="text" id="evt-title" placeholder="日程名称 (必填)" class="modern-input">
+                    
+                    <div class="time-group">
+                        <label>开始: <input type="datetime-local" id="evt-start"></label>
+                        <label>结束: <input type="datetime-local" id="evt-end"></label>
+                    </div>
+
+                    <div class="form-row">
+                        <label>重复:</label>
+                        <select id="evt-repeat" class="modern-select">
+                            <option value="none" selected>仅一次</option>
+                            <option value="daily">每天</option>
+                            <option value="weekly">每周</option>
+                            <option value="yearly">每年</option>
+                        </select>
+                    </div>
+
+                    <div class="priority-section">
+                        <div class="priority-label">
+                            <span>紧急程度:</span>
+                            <span id="priority-text" style="color: var(--color-normal)">一般</span>
+                        </div>
+                        <input type="range" id="evt-priority" min="0" max="3" step="1" value="1" class="priority-slider">
+                    </div>
+
+                    <textarea id="evt-desc" placeholder="添加备注..." rows="3" class="modern-textarea"></textarea>
+                    
+                    <button id="btn-save-event" class="save-btn">保存日程</button>
+                </div>
             </div>
         </aside>
         <main class="right-panel">
             <div id="right-panel-top" class="topbar">
                 <div id="right-top-date-display">
-                    <div id="topbar-year">
-                        2026
-                    </div>
+                    <div id="topbar-year">2026</div>
                     <div class="date-division"></div>
-                    <div id="topbar-month">
-                        1
-                    </div>
+                    <div id="topbar-month">1</div>
                     <div class="date-division"></div>
-                    <div id="topbar-day">
-                        1
+                    <div id="topbar-day">29</div>
+                    <div id="topbar-weekday">星期四</div>
+                </div>
+                <div id="priority-stats-container" class="priority-stats"></div>
+            
+            </div>
+
+            <div id="event-list-container" class="event-list-wrapper">
+                <div class="empty-state">
+                    <p>加载中或暂无日程...</p>
+                </div>
+            </div>
+            <div class="completed-section">
+                <div class="completed-header" id="btn-toggle-completed">
+                    <div class="header-left">
+                        <span class="drawer-icon">📂</span> <h4>已完成任务 <span id="completed-count">(0)</span></h4>
                     </div>
-                    <div class="date-division"></div>
-                    <div id="topbar-weekday">
-                        星期四
-                    </div>
+                    <span id="completed-arrow" class="arrow-icon">▼</span>
                 </div>
 
+                <div id="completed-list-container" class="completed-list-wrapper">
+                    </div>
             </div>
         </main>
     </div>

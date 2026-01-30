@@ -41,6 +41,7 @@
     color: var(--text-muted);
     font-size: 0.85rem;
     margin-bottom: 10px;
+    gap: 8px;
 }
 
 .days-grid {
@@ -54,11 +55,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    align-items: center;
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: 1rem;
     border-radius: 15%;
     transition: all 0.2s;
     color: var(--text-main);
+    display: flex;
+    position: relative;
+    border: 2px solid transparent; /* 默认透明边框，防止切换时跳动 */
+    box-sizing: border-box; /* 包括边框在内计算尺寸 */
+    padding-bottom: 4px;
 }
 
 .day:hover {
@@ -117,4 +124,24 @@
 .text-btn:hover {
     background: var(--primary-color) !important;
     color: white !important;
+}
+
+/* --- 日历小圆点样式 --- */
+.dots-container {
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    gap: 3px;          /* 圆点之间的间距 */
+    margin-top: 2px;   /* 距离上方数字的间距 */
+    height: 6px;       /* 占位高度，防止撑乱布局 */
+}
+
+.event-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    /* 颜色将通过 JS 动态内联样式设置 */
 }
